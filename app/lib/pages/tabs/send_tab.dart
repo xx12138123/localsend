@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:localsend_app/config/theme.dart';
 import 'package:localsend_app/gen/strings.g.dart';
 import 'package:localsend_app/model/send_mode.dart';
+import 'package:localsend_app/pages/receive_page.dart';
 import 'package:localsend_app/pages/selected_files_page.dart';
 import 'package:localsend_app/pages/tabs/send_tab_vm.dart';
 import 'package:localsend_app/pages/troubleshoot_page.dart';
@@ -17,6 +18,7 @@ import 'package:localsend_app/provider/selection/selected_sending_files_provider
 import 'package:localsend_app/provider/settings_provider.dart';
 import 'package:localsend_app/util/favorites.dart';
 import 'package:localsend_app/util/file_size_helper.dart';
+import 'package:localsend_app/util/ip_helper.dart';
 import 'package:localsend_app/util/native/file_picker.dart';
 import 'package:localsend_app/util/native/platform_check.dart';
 import 'package:localsend_app/widget/big_button.dart';
@@ -33,6 +35,7 @@ import 'package:localsend_app/widget/responsive_list_view.dart';
 import 'package:localsend_app/widget/rotating_widget.dart';
 import 'package:refena_flutter/refena_flutter.dart';
 import 'package:routerino/routerino.dart';
+import 'package:barcode_scan2/barcode_scan2.dart';
 
 const _horizontalPadding = 15.0;
 final _options = FilePickerOption.getOptionsForPlatform();
@@ -173,7 +176,7 @@ class SendTab extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 _ScanButton(
-                  ips: vm.localIps,
+                  ips: vm.localIps.where((ip) => !ip.contains(':')).toList(),
                 ),
                 Tooltip(
                   message: t.sendTab.manualSending,
@@ -191,6 +194,30 @@ class SendTab extends StatelessWidget {
                 ),
                 _SendModeButton(
                   onSelect: (mode) async => vm.onTapSendMode(context, mode),
+                ),
+                Tooltip(
+                  message: t.dialogs.favoriteDialog.title,
+                  child: CustomIconButton(
+                    onPressed: ()async{
+                      final result = await BarcodeScanner.scan(
+                        options: const ScanOptions(
+                          strings: {
+                            'cancel': '取消扫描',
+                            'flash_on': '打开闪光灯',
+                            'flash_off': '关闭闪光灯',
+                          },
+                          restrictFormat: [BarcodeFormat.qr],
+                        ),
+                      );
+                      if(result.rawContent.startsWith('localsend://')){
+                        Uri uri = Uri.parse(result.rawContent);
+                        if(uri.host == 'scan' && uri.path == '/qr' && uri.fragment.isNotEmpty){
+                          ref.global.dispatchAsync(StartQrIPsScan(ipList: uri.fragment.split(',')));
+                        }
+                      }
+                    },
+                    child: const Icon(Icons.qr_code_scanner),
+                  ),
                 ),
               ],
             ),
@@ -253,6 +280,7 @@ class SendTab extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 50),
+
           ],
         );
       },
@@ -564,3 +592,4 @@ extension on SessionStatus {
     }
   }
 }
+

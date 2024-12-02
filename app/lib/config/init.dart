@@ -50,6 +50,8 @@ import 'package:rhttp/rhttp.dart';
 import 'package:share_handler/share_handler.dart';
 import 'package:window_manager/window_manager.dart';
 
+import '../provider/network/scan_facade.dart';
+
 final _logger = Logger('Init');
 
 /// Will be called before the MaterialApp started
@@ -276,7 +278,14 @@ class _HandleShareIntentAction extends AsyncGlobalAction {
   Future<void> reduce() async {
     final message = payload.content;
     if (message != null && message.trim().isNotEmpty) {
-      ref.redux(selectedSendingFilesProvider).dispatch(AddMessageAction(message: message));
+      if(message.startsWith('localsend://')){
+        Uri uri = Uri.parse(message);
+        if(uri.host == 'scan' && uri.path == '/qr' && uri.fragment.isNotEmpty){
+          ref.global.dispatchAsync(StartQrIPsScan(ipList: uri.fragment.split(',')));
+        }
+      }else{
+        ref.redux(selectedSendingFilesProvider).dispatch(AddMessageAction(message: message));
+      }
     }
     await ref.redux(selectedSendingFilesProvider).dispatchAsync(AddFilesAction(
           files: payload.attachments?.where((a) => a != null).cast<SharedAttachment>() ?? <SharedAttachment>[],

@@ -53,6 +53,7 @@ class SettingsService extends PureNotifier<SettingsState> {
         shareViaLinkAutoAccept: _persistence.getShareViaLinkAutoAccept(),
         discoveryTimeout: _persistence.getDiscoveryTimeout(),
         advancedSettings: _persistence.getAdvancedSettingsEnabled(),
+        ipv6: _persistence.isIPv6(),
       );
 
   Future<void> setAlias(String alias) async {
@@ -171,6 +172,13 @@ class SettingsService extends PureNotifier<SettingsState> {
     await _persistence.setHttps(https);
     state = state.copyWith(
       https: https,
+    );
+  }
+
+  Future<void> setIPv6(bool ipv6) async {
+    await _persistence.setIPv6(ipv6);
+    state = state.copyWith(
+      ipv6: ipv6,
     );
   }
 

@@ -12,8 +12,12 @@ import 'package:localsend_app/widget/custom_icon_button.dart';
 import 'package:localsend_app/widget/local_send_logo.dart';
 import 'package:localsend_app/widget/responsive_list_view.dart';
 import 'package:localsend_app/widget/rotating_widget.dart';
+import 'package:pretty_qr_code/pretty_qr_code.dart';
 import 'package:refena_flutter/refena_flutter.dart';
 import 'package:routerino/routerino.dart';
+import 'package:barcode_scan2/barcode_scan2.dart';
+
+import '../../provider/network/scan_facade.dart';
 
 enum _QuickSaveMode {
   off,
@@ -66,6 +70,34 @@ class ReceiveTab extends StatelessWidget {
                             vm.serverState == null ? t.general.offline : vm.localIps.map((ip) => '#${ip.visualId}').toSet().join(' '),
                             style: const TextStyle(fontSize: 24),
                             textAlign: TextAlign.center,
+                          ),
+                        ),
+                        InitialFadeTransition(
+                          duration: Duration(milliseconds: 300),
+                          delay: Duration(milliseconds: 800),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              OutlinedButton(onPressed: () => showConnectQr(context, vm.localIps), child: Icon(Icons.qr_code)),
+                              OutlinedButton(onPressed: ()async{
+                                final result = await BarcodeScanner.scan(
+                                  options: const ScanOptions(
+                                    strings: {
+                                      'cancel': '取消扫描',
+                                      'flash_on': '打开闪光灯',
+                                      'flash_off': '关闭闪光灯',
+                                    },
+                                    restrictFormat: [BarcodeFormat.qr],
+                                  ),
+                                );
+                                if(result.rawContent.startsWith('localsend://')){
+                                  Uri uri = Uri.parse(result.rawContent);
+                                  if(uri.host == 'scan' && uri.path == '/qr' && uri.fragment.isNotEmpty){
+                                    context.ref.global.dispatchAsync(StartQrIPsScan(ipList: uri.fragment.split(',')));
+                                  }
+                                }
+                              }, child: Icon(Icons.qr_code_scanner))
+                            ],
                           ),
                         ),
                       ],
@@ -219,24 +251,36 @@ class _InfoBox extends StatelessWidget {
                       ),
                     ],
                   ),
-                  TableRow(
-                    children: [
-                      Text(t.receiveTab.infoBox.ip),
-                      const SizedBox(width: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (vm.localIps.isEmpty) Text(t.general.unknown),
-                          ...vm.localIps.map((ip) => SelectableText(ip)),
-                        ],
-                      ),
-                    ],
-                  ),
+
                   TableRow(
                     children: [
                       Text(t.receiveTab.infoBox.port),
                       const SizedBox(width: 10),
                       SelectableText(vm.serverState?.port.toString() ?? '-'),
+                    ],
+                  ),
+
+                  TableRow(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(t.receiveTab.infoBox.ip),
+                          IconButton(
+                              onPressed: () => showConnectQr(context, vm.localIps),
+                              icon: Icon(Icons.qr_code)
+                          )
+                        ],
+                      ),
+                      const SizedBox(width: 10),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (vm.localIps.isEmpty) Text(t.general.unknown),
+                          ...vm.localIps.map((ip) => SelectableText(ip.contains(':') ? ip.visualIPv6 : ip)),
+                        ],
+                      ),
                     ],
                   ),
                 ],
@@ -248,3 +292,23 @@ class _InfoBox extends StatelessWidget {
     );
   }
 }
+
+
+Future<void> showConnectQr(BuildContext context, List<String> ips) async {
+  await showDialog(context: context, builder: (c){
+    return AlertDialog(
+      content: PrettyQrView.data(
+        errorCorrectLevel: QrErrorCorrectLevel.M,
+        data: 'localsend://scan/qr#${ips.join(',')}',
+        decoration: PrettyQrDecoration(
+          shape: PrettyQrSmoothSymbol(
+            roundFactor: 0,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+        ),
+      ),
+    );
+  });
+}
+
+

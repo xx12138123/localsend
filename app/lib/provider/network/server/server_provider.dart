@@ -74,6 +74,7 @@ class ServerService extends Notifier<ServerState?> {
       alias: settings.alias,
       port: settings.port,
       https: settings.https,
+      ipv6: settings.ipv6,
     );
   }
 
@@ -82,6 +83,7 @@ class ServerService extends Notifier<ServerState?> {
     required String alias,
     required int port,
     required bool https,
+    required bool ipv6,
   }) async {
     if (state != null) {
       _logger.info('Server already running.');
@@ -119,7 +121,7 @@ class ServerService extends Notifier<ServerState?> {
     if (https) {
       final securityContext = ref.read(securityProvider);
       httpServer = await HttpServer.bindSecure(
-        '0.0.0.0',
+        ipv6 ? InternetAddress.anyIPv6 : '0.0.0.0',
         port,
         SecurityContext()
           ..usePrivateKeyBytes(securityContext.privateKey.codeUnits)
@@ -128,7 +130,7 @@ class ServerService extends Notifier<ServerState?> {
       _logger.info('Server started. (Port: $port, HTTPS only)');
     } else {
       httpServer = await HttpServer.bind(
-        '0.0.0.0',
+        ipv6 ? InternetAddress.anyIPv6 : '0.0.0.0',
         port,
       );
       _logger.info('Server started. (Port: $port, HTTP only)');
@@ -144,6 +146,7 @@ class ServerService extends Notifier<ServerState?> {
       session: null,
       webSendState: null,
       pinAttempts: {},
+      ipv6: ipv6,
     );
 
     state = newServerState;
@@ -162,9 +165,9 @@ class ServerService extends Notifier<ServerState?> {
     return await startServerFromSettings();
   }
 
-  Future<ServerState?> restartServer({required String alias, required int port, required bool https}) async {
+  Future<ServerState?> restartServer({required String alias, required int port, required bool https, required bool ipv6}) async {
     await stopServer();
-    return await startServer(alias: alias, port: port, https: https);
+    return await startServer(alias: alias, port: port, https: https, ipv6: ipv6);
   }
 
   void acceptFileRequest(Map<String, String> fileNameMap) {

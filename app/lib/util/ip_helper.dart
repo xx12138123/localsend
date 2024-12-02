@@ -1,7 +1,8 @@
 import 'package:collection/collection.dart';
 
 extension StringIpExt on String {
-  String get visualId => split('.').last;
+  String get visualId => contains(':') ? visualIPv6 : split('.').last;
+  String get visualIPv6 => '${split(':').first}:...:${split(':').last}';
 }
 
 class IpHelper {

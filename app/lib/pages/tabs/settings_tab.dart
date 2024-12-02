@@ -267,7 +267,8 @@ class SettingsTab extends StatelessWidget {
                   crossFadeState: vm.serverState != null &&
                           (vm.serverState!.alias != vm.settings.alias ||
                               vm.serverState!.port != vm.settings.port ||
-                              vm.serverState!.https != vm.settings.https)
+                              vm.serverState!.https != vm.settings.https ||
+                              vm.serverState!.ipv6 != vm.settings.ipv6)
                       ? CrossFadeState.showSecond
                       : CrossFadeState.showFirst,
                   duration: const Duration(milliseconds: 200),
@@ -437,6 +438,14 @@ class SettingsTab extends StatelessWidget {
                         await ref.notifier(settingsProvider).setMulticastGroup(s);
                       },
                     ),
+                  ),
+                if(vm.advanced)
+                  _BooleanEntry(
+                    label: 'IPv6',
+                    value: vm.settings.ipv6,
+                    onChanged: (b) async {
+                      await ref.notifier(settingsProvider).setIPv6(b);
+                    },
                   ),
                 AnimatedCrossFade(
                   crossFadeState: vm.settings.port != defaultPort ? CrossFadeState.showSecond : CrossFadeState.showFirst,

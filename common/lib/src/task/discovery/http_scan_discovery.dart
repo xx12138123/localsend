@@ -27,7 +27,7 @@ class HttpScanDiscoveryService {
     _runners[networkInterface] = TaskRunner<Device?>(
       initialTasks: List.generate(
         ipList.length,
-        (index) => () async => _doRequest(ipList[index], port, https),
+        (index) => () async => doRequest(ipList[index], port, https),
       ),
       concurrency: 50,
     );
@@ -41,7 +41,7 @@ class HttpScanDiscoveryService {
         devices.length,
         (index) => () async {
           final device = devices[index];
-          return _doRequest(device.$1, device.$2, https);
+          return doRequest(device.$1, device.$2, https);
         },
       ),
       concurrency: 50,
@@ -49,8 +49,20 @@ class HttpScanDiscoveryService {
 
     return runner.stream.where((device) => device != null).cast<Device>();
   }
+  
+  Stream<Device> getQrIPsStream({required List<String> ipList, required int port, required bool https}){
+    final runner = TaskRunner<Device?>(
+      initialTasks: List.generate(
+        ipList.length,
+            (index) => () async => doRequest(ipList[index], port, https),
+      ),
+      concurrency: 50,
+    );
 
-  Future<Device?> _doRequest(String currentIp, int port, bool https) async {
+    return runner.stream.where((device) => device != null).cast<Device>();
+  }
+
+  Future<Device?> doRequest(String currentIp, int port, bool https) async {
     _logger.fine('Requesting $currentIp');
     final device = await _targetedDiscoveryService.state.discover(
       ip: currentIp,

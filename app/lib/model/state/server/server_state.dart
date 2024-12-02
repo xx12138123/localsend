@@ -11,6 +11,7 @@ class ServerState with ServerStateMappable {
   final String alias;
   final int port;
   final bool https;
+  final bool ipv6;
   final ReceiveSessionState? session;
   final WebSendState? webSendState;
   final Map<String, int> pinAttempts; // IP address -> attempts (won't be reset on session end)
@@ -23,5 +24,6 @@ class ServerState with ServerStateMappable {
     required this.session,
     required this.webSendState,
     required this.pinAttempts,
+    required this.ipv6,
   });
 }

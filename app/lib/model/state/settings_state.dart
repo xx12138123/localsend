@@ -33,6 +33,7 @@ class SettingsState with SettingsStateMappable {
   final bool shareViaLinkAutoAccept;
   final int discoveryTimeout;
   final bool advancedSettings;
+  final bool ipv6;
 
   const SettingsState({
     required this.showToken,
@@ -59,5 +60,6 @@ class SettingsState with SettingsStateMappable {
     required this.shareViaLinkAutoAccept,
     required this.discoveryTimeout,
     required this.advancedSettings,
+    required this.ipv6,
   });
 }

@@ -103,6 +103,36 @@ class StartMulticastScan extends ReduxAction<NearbyDevicesService, NearbyDevices
 
 /// Scans one particular subnet with traditional HTTP/TCP discovery.
 /// This method awaits until the scan is finished.
+class StartIPsScan extends AsyncReduxAction<NearbyDevicesService, NearbyDevicesState> {
+  final int port;
+  final List<String> ipList;
+  final bool https;
+
+  StartIPsScan({
+    required this.port,
+    required this.ipList,
+    required this.https,
+  });
+
+  @override
+  Future<NearbyDevicesState> reduce() async {
+    for(var ip in ipList){
+      await external(notifier._isolateController).dispatchAsyncTakeResult(IsolateTargetHttpDiscoveryAction(
+        ip: ip,
+        port: port,
+        https: https,
+      )).then((device)async{
+        if(device != null){
+          await dispatchAsync(RegisterDeviceAction(device));
+        }
+      });
+    }
+    return state;
+  }
+}
+
+/// Scans one particular subnet with traditional HTTP/TCP discovery.
+/// This method awaits until the scan is finished.
 class StartLegacyScan extends AsyncReduxAction<NearbyDevicesService, NearbyDevicesState> {
   final int port;
   final String localIp;

@@ -54,6 +54,7 @@ class _WebSendPageState extends State<WebSendPage> with Refena {
             alias: settings.alias,
             port: settings.port,
             https: _encrypted,
+            ipv6: settings.ipv6,
           );
       await ref.notifier(serverProvider).initializeWebSend(widget.files);
       if (beforeAutoAccept != null) {
@@ -160,10 +161,10 @@ class _WebSendPageState extends State<WebSendPage> with Refena {
                             padding: const EdgeInsets.all(5),
                             child: Row(
                               children: [
-                                SelectableText(
+                                Expanded(child: SelectableText(
                                   url,
                                   style: Theme.of(context).textTheme.bodyMedium,
-                                ),
+                                )),
                                 const SizedBox(width: 5),
                                 InkWell(
                                   onTap: () async {
@@ -174,7 +175,7 @@ class _WebSendPageState extends State<WebSendPage> with Refena {
                                   },
                                   child: const Padding(
                                     padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                    child: Icon(Icons.content_copy, size: 16),
+                                    child: Icon(Icons.content_copy, size: 20),
                                   ),
                                 ),
                                 InkWell(
@@ -191,25 +192,25 @@ class _WebSendPageState extends State<WebSendPage> with Refena {
                                   },
                                   child: const Padding(
                                     padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                    child: Icon(Icons.qr_code, size: 16),
+                                    child: Icon(Icons.qr_code, size: 20),
                                   ),
                                 ),
-                                InkWell(
-                                  onTap: () async {
-                                    await showDialog(
-                                      context: context,
-                                      builder: (_) => ZoomDialog(
-                                        label: url,
-                                        pin: webSendState.pin,
-                                        listenIncomingWebSendRequests: true,
-                                      ),
-                                    );
-                                  },
-                                  child: const Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                    child: Icon(Icons.tv, size: 16),
-                                  ),
-                                ),
+                                // InkWell(
+                                //   onTap: () async {
+                                //     await showDialog(
+                                //       context: context,
+                                //       builder: (_) => ZoomDialog(
+                                //         label: url,
+                                //         pin: webSendState.pin,
+                                //         listenIncomingWebSendRequests: true,
+                                //       ),
+                                //     );
+                                //   },
+                                //   child: const Padding(
+                                //     padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                //     child: Icon(Icons.tv, size: 16),
+                                //   ),
+                                // ),
                               ],
                             ),
                           );

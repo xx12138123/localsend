@@ -86,8 +86,14 @@ Future<List<String>> _getIp() async {
   if (!kIsWeb) {
     try {
       // fallback with dart:io NetworkInterface
+
       final result = (await NetworkInterface.list()).map((networkInterface) => networkInterface.addresses).expand((ip) => ip);
-      nativeResult = result.where((ip) => ip.type == InternetAddressType.IPv4).map((address) => address.address).toList();
+      nativeResult = result
+          //.where((ip) => ip.type == InternetAddressType.IPv4)
+          .map((address) => address.type == InternetAddressType.IPv6
+            ? '[${address.address.split('%').first}]'
+            : address.address)
+          .toList();
     } catch (e, st) {
       _logger.info('Failed to get IP from dart:io', e, st);
     }

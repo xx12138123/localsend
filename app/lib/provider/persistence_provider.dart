@@ -77,6 +77,7 @@ const _receivePin = 'ls_receive_pin';
 const _autoFinish = 'ls_auto_finish';
 const _minimizeToTray = 'ls_minimize_to_tray';
 const _https = 'ls_https';
+const _ipv6 = 'ls_ipv6';
 const _sendMode = 'ls_send_mode';
 const _enableAnimations = 'ls_enable_animations';
 const _deviceType = 'ls_device_type';
@@ -396,6 +397,14 @@ class PersistenceService {
 
   Future<void> setHttps(bool https) async {
     await _prefs.setBool(_https, https);
+  }
+
+  bool isIPv6(){
+    return _prefs.getBool(_ipv6) ?? true;
+  }
+
+  Future<void> setIPv6(bool ipv6) async {
+    await _prefs.setBool(_ipv6, ipv6);
   }
 
   SendMode getSendMode() {

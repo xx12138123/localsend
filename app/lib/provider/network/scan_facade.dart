@@ -59,6 +59,29 @@ class StartSmartScan extends AsyncGlobalAction {
 }
 
 /// HTTP based discovery on a fixed set of subnets.
+class StartQrIPsScan extends AsyncGlobalAction {
+  final List<String> ipList;
+
+  StartQrIPsScan({
+    required this.ipList,
+  });
+
+  @override
+  Future<void> reduce() async {
+    final settings = ref.read(settingsProvider);
+    final port = settings.port;
+    final https = settings.https;
+
+    await ref.redux(nearbyDevicesProvider).dispatchAsync(StartIPsScan(port: port, ipList: ipList, https: https));
+    // await Future.wait<void>([
+    //   for (final ip in ips){
+    //     //ref.redux(nearbyDevicesProvider).dispatchAsync(StartLegacyScan(port: port, localIp: ip, https: https)),
+    //   }
+    // ]);
+  }
+}
+
+/// HTTP based discovery on a fixed set of subnets.
 class StartLegacySubnetScan extends AsyncGlobalAction {
   final List<String> subnets;
 
