@@ -37,6 +37,9 @@ import 'package:refena_flutter/refena_flutter.dart';
 import 'package:routerino/routerino.dart';
 import 'package:barcode_scan2/barcode_scan2.dart';
 
+import '../home_page.dart';
+import '../home_page_controller.dart';
+
 const _horizontalPadding = 15.0;
 final _options = FilePickerOption.getOptionsForPlatform();
 
@@ -214,6 +217,7 @@ class SendTab extends StatelessWidget {
                         if(uri.host == 'scan' && uri.path == '/qr' && uri.fragment.isNotEmpty){
                           ref.global.dispatchAsync(StartQrIPsScan(ipList: uri.fragment.split(',')));
                         }
+                        ref.redux(homePageControllerProvider).dispatch(ChangeTabAction(HomeTab.send));
                       }
                     },
                     child: const Icon(Icons.qr_code_scanner),

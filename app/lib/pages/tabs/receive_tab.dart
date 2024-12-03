@@ -95,6 +95,7 @@ class ReceiveTab extends StatelessWidget {
                                   if(uri.host == 'scan' && uri.path == '/qr' && uri.fragment.isNotEmpty){
                                     context.ref.global.dispatchAsync(StartQrIPsScan(ipList: uri.fragment.split(',')));
                                   }
+                                  context.ref.redux(homePageControllerProvider).dispatch(ChangeTabAction(HomeTab.send));
                                 }
                               }, child: Icon(Icons.qr_code_scanner))
                             ],

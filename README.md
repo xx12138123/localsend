@@ -1,3 +1,5 @@
+基于源项目添加IPv6和扫码添加设备，用于双方都有公网v6的情况下通过公网v6传输文件。
+
 # LocalSend
 
 [![CI status][ci-badge]][ci-workflow]
