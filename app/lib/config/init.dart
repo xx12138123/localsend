@@ -47,10 +47,11 @@ import 'package:localsend_app/util/ui/snackbar.dart';
 import 'package:logging/logging.dart';
 import 'package:refena_flutter/refena_flutter.dart';
 import 'package:rhttp/rhttp.dart';
-import 'package:share_handler/share_handler.dart';
+//import 'package:share_handler/share_handler.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '../provider/network/scan_facade.dart';
+import '../util/native/android_saf.dart';
 
 final _logger = Logger('Init');
 
@@ -232,25 +233,33 @@ Future<void> postInit(BuildContext context, Ref ref, bool appStart) async {
   bool hasInitialShare = false;
 
   if (checkPlatformCanReceiveShareIntent()) {
-    final shareHandler = ShareHandlerPlatform.instance;
-
-    if (appStart) {
-      final initialSharedPayload = await shareHandler.getInitialSharedMedia();
-      if (initialSharedPayload != null) {
-        hasInitialShare = true;
-        // ignore: unawaited_futures
-        ref.global.dispatchAsync(_HandleShareIntentAction(
-          payload: initialSharedPayload,
-        ));
-      }
-    }
-
-    _sharedMediaSubscription?.cancel(); // ignore: unawaited_futures
-    _sharedMediaSubscription = shareHandler.sharedMediaStream.listen((SharedMedia payload) {
-      ref.global.dispatchAsync(_HandleShareIntentAction(
-        payload: payload,
+    listenReceiveFile((files)async{
+      await ref.redux(selectedSendingFilesProvider).dispatchAsync(AddFilesAction(
+        files: files,
+        converter: CrossFileConverters.convertFileInfo,
       ));
+      ref.redux(homePageControllerProvider).dispatch(ChangeTabAction(HomeTab.send));
     });
+    hasInitialShare = true;
+    // final shareHandler = ShareHandlerPlatform.instance;
+    //
+    // if (appStart) {
+    //   final initialSharedPayload = await shareHandler.getInitialSharedMedia();
+    //   if (initialSharedPayload != null) {
+    //     hasInitialShare = true;
+    //     // ignore: unawaited_futures
+    //     ref.global.dispatchAsync(_HandleShareIntentAction(
+    //       payload: initialSharedPayload,
+    //     ));
+    //   }
+    // }
+    //
+    // _sharedMediaSubscription?.cancel(); // ignore: unawaited_futures
+    // _sharedMediaSubscription = shareHandler.sharedMediaStream.listen((SharedMedia payload) {
+    //   ref.global.dispatchAsync(_HandleShareIntentAction(
+    //     payload: payload,
+    //   ));
+    // });
   }
 
   if (appStart && !hasInitialShare && (checkPlatformWithGallery() || checkPlatformCanReceiveShareIntent())) {
@@ -267,34 +276,34 @@ Future<void> postInit(BuildContext context, Ref ref, bool appStart) async {
   // [FOSS_REMOVE_END]
 }
 
-class _HandleShareIntentAction extends AsyncGlobalAction {
-  final SharedMedia payload;
-
-  _HandleShareIntentAction({
-    required this.payload,
-  });
-
-  @override
-  Future<void> reduce() async {
-    final message = payload.content;
-    if (message != null && message.trim().isNotEmpty) {
-      if(message.startsWith('localsend://')){
-        Uri uri = Uri.parse(message);
-        if(uri.host == 'scan' && uri.path == '/qr' && uri.fragment.isNotEmpty){
-          ref.global.dispatchAsync(StartQrIPsScan(ipList: uri.fragment.split(',')));
-        }
-      }else{
-        ref.redux(selectedSendingFilesProvider).dispatch(AddMessageAction(message: message));
-      }
-    }
-    await ref.redux(selectedSendingFilesProvider).dispatchAsync(AddFilesAction(
-          files: payload.attachments?.where((a) => a != null).cast<SharedAttachment>() ?? <SharedAttachment>[],
-          converter: CrossFileConverters.convertSharedAttachment,
-        ));
-
-    ref.redux(homePageControllerProvider).dispatch(ChangeTabAction(HomeTab.send));
-  }
-}
+// class _HandleShareIntentAction extends AsyncGlobalAction {
+//   final SharedMedia payload;
+//
+//   _HandleShareIntentAction({
+//     required this.payload,
+//   });
+//
+//   @override
+//   Future<void> reduce() async {
+//     final message = payload.content;
+//     if (message != null && message.trim().isNotEmpty) {
+//       if(message.startsWith('localsend://')){
+//         Uri uri = Uri.parse(message);
+//         if(uri.host == 'scan' && uri.path == '/qr' && uri.fragment.isNotEmpty){
+//           ref.global.dispatchAsync(StartQrIPsScan(ipList: uri.fragment.split(',')));
+//         }
+//       }else{
+//         ref.redux(selectedSendingFilesProvider).dispatch(AddMessageAction(message: message));
+//       }
+//     }
+//     await ref.redux(selectedSendingFilesProvider).dispatchAsync(AddFilesAction(
+//           files: payload.attachments?.where((a) => a != null).cast<SharedAttachment>() ?? <SharedAttachment>[],
+//           converter: CrossFileConverters.convertSharedAttachment,
+//         ));
+//
+//     ref.redux(homePageControllerProvider).dispatch(ChangeTabAction(HomeTab.send));
+//   }
+// }
 
 class _HandleAppStartArgumentsAction extends AsyncGlobalAction {
   final List<String> args;

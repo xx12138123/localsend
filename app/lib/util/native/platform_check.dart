@@ -24,7 +24,7 @@ bool checkPlatformHasTray() {
 
 /// This platform can receive share intents
 bool checkPlatformCanReceiveShareIntent() {
-  return checkPlatform([TargetPlatform.android, TargetPlatform.iOS]);
+  return checkPlatform([TargetPlatform.android]);
 }
 
 /// This platform can select folders

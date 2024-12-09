@@ -55,7 +55,7 @@ dependencies:
   routerino: 0.8.0
   saf_stream: 0.10.0
   screen_retriever: 0.2.0
-  share_handler: 0.0.22
+  # share_handler: 0.0.22
   shared_preferences: 2.3.3
   shared_preferences_platform_interface: any
   shared_storage: 0.8.1

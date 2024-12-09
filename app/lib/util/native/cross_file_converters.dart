@@ -7,7 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:localsend_app/model/cross_file.dart';
 import 'package:localsend_app/util/file_path_helper.dart';
 import 'package:localsend_app/util/native/android_saf.dart';
-import 'package:share_handler/share_handler.dart';
+//import 'package:share_handler/share_handler.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 /// Utility functions to convert third party models to common [CrossFile] model.
@@ -69,21 +69,21 @@ class CrossFileConverters {
     );
   }
 
-  static Future<CrossFile> convertSharedAttachment(SharedAttachment attachment) async {
-    final file = File(attachment.path);
-    final fileName = attachment.path.fileName;
-    return CrossFile(
-      name: fileName,
-      fileType: fileName.guessFileType(),
-      size: await file.length(),
-      thumbnail: null,
-      asset: null,
-      path: file.path,
-      bytes: null,
-      lastModified: file.lastModifiedSync().toUtc(),
-      lastAccessed: file.lastAccessedSync().toUtc(),
-    );
-  }
+  // static Future<CrossFile> convertSharedAttachment(SharedAttachment attachment) async {
+  //   final file = File(attachment.path);
+  //   final fileName = attachment.path.fileName;
+  //   return CrossFile(
+  //     name: fileName,
+  //     fileType: fileName.guessFileType(),
+  //     size: await file.length(),
+  //     thumbnail: null,
+  //     asset: null,
+  //     path: file.path,
+  //     bytes: null,
+  //     lastModified: file.lastModifiedSync().toUtc(),
+  //     lastAccessed: file.lastAccessedSync().toUtc(),
+  //   );
+  // }
 
   static Future<CrossFile> convertApplication(Application app) async {
     final file = File(app.apkFilePath);

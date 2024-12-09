@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:dart_mappable/dart_mappable.dart';
 import 'package:flutter/services.dart';
 import 'package:localsend_app/util/native/content_uri_helper.dart';
@@ -13,6 +16,24 @@ final _logger = Logger('AndroidSaf');
 /// We implemented our own algorithm to build encode and decode content URIs.
 /// Older versions might also work but the encoded content URI is not guaranteed to work with our algorithm.
 const contentUriMinSdk = 27;
+
+void listenReceiveFile(Function(List<FileInfo>) onReceive){
+  _methodChannel.setMethodCallHandler((call)async{
+    if(call.method == 'onReceiveFile'){
+      final args = call.arguments;
+      if(args != null){
+        List<FileInfo> files = [];
+        for(var e in args){
+          files.add(FileInfoMapper.fromJson((e as Map).cast<String, dynamic>()));
+        }
+        if(files.isNotEmpty){
+          onReceive(files);
+        }
+      }
+    }
+    return;
+  });
+}
 
 Future<PickDirectoryResult?> pickDirectoryAndroid() async {
   final result = await _methodChannel.invokeMethod<Map>('pickDirectory');
