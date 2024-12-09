@@ -233,13 +233,14 @@ Future<void> postInit(BuildContext context, Ref ref, bool appStart) async {
   bool hasInitialShare = false;
 
   if (checkPlatformCanReceiveShareIntent()) {
-    listenReceiveFile((files)async{
+    listenReceiveFile().listen((files)async{
       await ref.redux(selectedSendingFilesProvider).dispatchAsync(AddFilesAction(
         files: files,
         converter: CrossFileConverters.convertFileInfo,
       ));
       ref.redux(homePageControllerProvider).dispatch(ChangeTabAction(HomeTab.send));
     });
+
     hasInitialShare = true;
     // final shareHandler = ShareHandlerPlatform.instance;
     //

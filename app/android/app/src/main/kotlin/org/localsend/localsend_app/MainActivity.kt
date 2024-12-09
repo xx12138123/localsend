@@ -14,7 +14,6 @@ import io.flutter.plugin.common.MethodChannel
 
 
 
-
 private const val CHANNEL = "org.localsend.localsend_app/localsend"
 private const val REQUEST_CODE_PICK_DIRECTORY = 1
 private const val REQUEST_CODE_PICK_DIRECTORY_PATH = 2
@@ -58,9 +57,13 @@ class MainActivity : FlutterActivity() {
                 else -> result.notImplemented()
             }
         }
+
         if(channelIntent != null){
             dealIntent(channelIntent!!)
             channelIntent = null
+        }
+        if(intent.data != null || intent.clipData != null){
+            dealIntent(intent)
         }
     }
 

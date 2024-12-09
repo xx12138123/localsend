@@ -9,6 +9,7 @@ import 'package:localsend_app/model/persistence/color_mode.dart';
 import 'package:localsend_app/pages/home_page.dart';
 import 'package:localsend_app/provider/local_ip_provider.dart';
 import 'package:localsend_app/provider/settings_provider.dart';
+import 'package:localsend_app/util/native/android_saf.dart';
 import 'package:localsend_app/util/ui/dynamic_colors.dart';
 import 'package:localsend_app/widget/watcher/life_cycle_watcher.dart';
 import 'package:localsend_app/widget/watcher/shortcut_watcher.dart';
@@ -28,6 +29,8 @@ Future<void> main(List<String> args) async {
     );
     return;
   }
+
+  initReceiveChannel();
 
   runApp(RefenaScope.withContainer(
     container: container,
