@@ -1,5 +1,8 @@
 基于源项目添加IPv6和扫码添加设备，用于双方都有公网v6的情况下通过公网v6传输文件。
 
+移除share_handle插件，该插件会导致接收其他应用分享的文件时先复制到私有目录，分享大文件时造成白屏和空间浪费。
+移除后android手动解析content链接，ios接收功能暂未适配。
+
 # LocalSend
 
 [![CI status][ci-badge]][ci-workflow]
