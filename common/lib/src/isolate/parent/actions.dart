@@ -51,6 +51,7 @@ class IsolateTargetHttpDiscoveryAction extends AsyncReduxActionWithResult<Isolat
     });
 
     await for (final result in connection.receiveFromIsolate) {
+      print('connect to ${ip} rsult ${result}');
       if (result.id == task.id) {
         switch (result) {
           case IsolateTaskSuccessResult<Device>():

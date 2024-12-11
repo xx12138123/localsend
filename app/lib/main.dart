@@ -54,7 +54,7 @@ class LocalSendApp extends StatelessWidget {
           onChangedState: (AppLifecycleState state) {
             switch (state) {
               case AppLifecycleState.resumed:
-                ref.redux(localIpProvider).dispatch(InitLocalIpAction());
+                ref.redux(localIpProvider).dispatch(InitLocalIpAction(ref: ref));
                 break;
               case AppLifecycleState.detached:
                 // The main isolate is only exited when all child isolates are exited.

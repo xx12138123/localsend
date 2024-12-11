@@ -93,7 +93,7 @@ class ReceiveTab extends StatelessWidget {
                                 if(result.rawContent.startsWith('localsend://')){
                                   Uri uri = Uri.parse(result.rawContent);
                                   if(uri.host == 'scan' && uri.path == '/qr' && uri.fragment.isNotEmpty){
-                                    context.ref.global.dispatchAsync(StartQrIPsScan(ipList: uri.fragment.split(',')));
+                                    context.ref.global.dispatchAsync(StartQrIPsScan(ipList: Uri.decodeComponent(uri.fragment).split(',')));
                                   }
                                   context.ref.redux(homePageControllerProvider).dispatch(ChangeTabAction(HomeTab.send));
                                 }

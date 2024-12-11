@@ -215,7 +215,7 @@ class SendTab extends StatelessWidget {
                       if(result.rawContent.startsWith('localsend://')){
                         Uri uri = Uri.parse(result.rawContent);
                         if(uri.host == 'scan' && uri.path == '/qr' && uri.fragment.isNotEmpty){
-                          ref.global.dispatchAsync(StartQrIPsScan(ipList: uri.fragment.split(',')));
+                          ref.global.dispatchAsync(StartQrIPsScan(ipList: Uri.decodeComponent(uri.fragment).split(',')));
                         }
                         ref.redux(homePageControllerProvider).dispatch(ChangeTabAction(HomeTab.send));
                       }

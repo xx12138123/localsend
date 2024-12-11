@@ -221,7 +221,9 @@ class SendController {
       } else {
         final path = file.path!;
         final tmpfile = File(file.path!);
-        request.response.headers.set('content-length', '${tmpfile.lengthSync()}');
+        if(!path.startsWith('content://')){
+          request.response.headers.set('content-length', '${tmpfile.lengthSync()}');
+        }
 
         final fileStream = path.startsWith('content://') ? UriContent().getContentStream(Uri.parse(file.path!)) : tmpfile.openRead();
         final (streamController, subscription) = fileStream.digested();

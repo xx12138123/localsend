@@ -117,15 +117,19 @@ class StartIPsScan extends AsyncReduxAction<NearbyDevicesService, NearbyDevicesS
   @override
   Future<NearbyDevicesState> reduce() async {
     for(var ip in ipList){
-      await external(notifier._isolateController).dispatchAsyncTakeResult(IsolateTargetHttpDiscoveryAction(
-        ip: ip,
-        port: port,
-        https: https,
-      )).then((device)async{
-        if(device != null){
-          await dispatchAsync(RegisterDeviceAction(device));
-        }
-      });
+      try{
+        await external(notifier._isolateController).dispatchAsyncTakeResult(IsolateTargetHttpDiscoveryAction(
+          ip: ip,
+          port: port,
+          https: https,
+        )).then((device)async{
+          if(device != null){
+            await dispatchAsync(RegisterDeviceAction(device));
+          }
+        });
+      }catch(e){
+
+      }
     }
     return state;
   }
